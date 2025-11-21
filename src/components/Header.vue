@@ -91,7 +91,10 @@ defineExpose({ focusSearch });
           class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center pointer-events-none"
         >
           <span class="text-xs text-gray-400 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-0.5">
-            <span v-if="isMac" class="text-[10px]">{{ shortcutKey }}</span>
+            <span
+              v-if="isMac"
+              class="text-[10px]"
+            >{{ shortcutKey }}</span>
             <span v-else>{{ shortcutKey }}+</span>K
           </span>
         </div>

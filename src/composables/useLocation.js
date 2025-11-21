@@ -1,12 +1,15 @@
 import { ref } from 'vue';
 
+// Constants
+const DEFAULT_LOCATION = {
+  name: 'London',
+  country: 'United Kingdom',
+  lat: 51.5074,
+  lon: -0.1278,
+};
+
 export function useLocation() {
-  const currentLocation = ref({
-    name: 'London',
-    country: 'United Kingdom',
-    lat: 51.5074,
-    lon: -0.1278,
-  });
+  const currentLocation = ref({ ...DEFAULT_LOCATION });
   const loading = ref(false);
   const error = ref(null);
 
@@ -19,33 +22,40 @@ export function useLocation() {
     };
   };
 
-  const getUserLocation = (onSuccess, onError) => {
+  const getUserLocation = async (onSuccess, onError) => {
     loading.value = true;
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          currentLocation.value = {
-            ...currentLocation.value,
-            name: 'Your Location',
-            lat: latitude,
-            lon: longitude,
-          };
-          loading.value = false;
-          if (onSuccess) onSuccess(latitude, longitude);
-        },
-        (err) => {
-          console.error('Error getting location:', err);
-          error.value = 'Failed to get location';
-          loading.value = false;
-          if (onError) onError(err);
-          // Fallback to default is already set
-          if (onSuccess) onSuccess(currentLocation.value.lat, currentLocation.value.lon);
-        }
-      );
-    } else {
+    error.value = null;
+
+    try {
+      if (!navigator.geolocation) {
+        const coords = { lat: currentLocation.value.lat, lon: currentLocation.value.lon };
+        if (onSuccess) onSuccess(coords.lat, coords.lon);
+        return coords;
+      }
+
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
+
+      const { latitude, longitude } = position.coords;
+      currentLocation.value = {
+        ...currentLocation.value,
+        name: 'Your Location',
+        lat: latitude,
+        lon: longitude,
+      };
+
+      if (onSuccess) onSuccess(latitude, longitude);
+      return { lat: latitude, lon: longitude };
+    } catch (err) {
+      console.error('Geolocation error:', err);
+      error.value = 'Failed to get location';
+      const coords = { lat: currentLocation.value.lat, lon: currentLocation.value.lon };
+      if (onError) onError(err);
+      if (onSuccess) onSuccess(coords.lat, coords.lon);
+      return coords;
+    } finally {
       loading.value = false;
-      if (onSuccess) onSuccess(currentLocation.value.lat, currentLocation.value.lon);
     }
   };
 

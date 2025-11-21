@@ -3,6 +3,7 @@ import { WeatherProvider } from './WeatherProvider';
 
 const BASE_URL = 'https://api.open-meteo.com/v1/forecast';
 const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
+const TIMEOUT_MS = 10000;
 
 export class OpenMeteoProvider extends WeatherProvider {
   async getWeather(lat, lon) {
@@ -17,9 +18,13 @@ export class OpenMeteoProvider extends WeatherProvider {
           timezone: 'auto',
           forecast_days: 7,
         },
+        timeout: TIMEOUT_MS
       });
       return this.normalize(response.data);
     } catch (error) {
+      if (error.code === 'ECONNABORTED') {
+        throw new Error('Request timeout. Please try again.');
+      }
       console.error('Error fetching weather data:', error);
       throw error;
     }
@@ -34,9 +39,13 @@ export class OpenMeteoProvider extends WeatherProvider {
           language: 'en',
           format: 'json',
         },
+        timeout: TIMEOUT_MS
       });
       return response.data.results || [];
     } catch (error) {
+      if (error.code === 'ECONNABORTED') {
+        throw new Error('Request timeout. Please try again.');
+      }
       console.error('Error searching city:', error);
       throw error;
     }
