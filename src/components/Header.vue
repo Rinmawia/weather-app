@@ -72,7 +72,7 @@ defineExpose({ focusSearch });
   <header class="flex items-center justify-between p-4 md:p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-sm sticky top-0 z-50 transition-colors duration-300">
     <div class="flex items-center gap-2">
       <h1 class="text-xl md:text-2xl font-bold bg-linear-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-        WeatherApp
+        Khawchin
       </h1>
     </div>
 

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onBeforeUnmount } from 'vue';
+import { onMounted, onBeforeUnmount, watch } from 'vue';
 import Header from './components/Header.vue';
 import CurrentWeather from './components/CurrentWeather.vue';
 import HourlyForecast from './components/HourlyForecast.vue';
@@ -24,6 +24,17 @@ const {
   fetchWeather, 
   handleSimulation 
 } = useWeather();
+
+// Dynamic page title
+watch([weatherData, currentLocation], ([weather, location]) => {
+  if (weather?.current && location) {
+    const temp = Math.round(weather.current.temp);
+    const locationName = location.name;
+    document.title = `${temp}° ${locationName} - Khawchin by RIN.K`;
+  } else {
+    document.title = 'Khawchin by RIN.K';
+  }
+}, { immediate: true });
 
 // Handlers
 const handleCitySelected = (city) => {
